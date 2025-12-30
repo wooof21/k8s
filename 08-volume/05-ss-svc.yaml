@@ -1,0 +1,61 @@
+
+
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: my-ss
+spec:
+  serviceName: nginx-service
+  selector:
+    matchLabels:
+      app: my-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: nginx
+        image: vinsdocker/nginx-gke   # just for demo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: my-app
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-pod # run exec command
+spec:
+  terminationGracePeriodSeconds: 1
+  containers:
+  - name: demo
+    image: vinsdocker/util
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    args:
+    - "sleep"
+    - "3600"        
+
+
+# run: `kubectl apply -f 05-...`
+
+# exec into demo-pod: `kubectl exec -it demo-pod -- bash`
+  ## request to the service, service name = nginx-service: 
+  ## run `curl nginx-service` multiple times, requests were load balanced and touted to random pod every time
+
+# to send request to a particular pod: -> Headless Service

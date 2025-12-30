@@ -1,0 +1,22 @@
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: my-rs
+spec:
+  selector:
+    matchLabels:
+      team: team-a
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        team: team-a
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+# create Pods from multiple-pods: `kubectl create -f multiple-pods.yaml`
+# create replicaSet: `kubectl create -f 02-existing-pod-manager.yaml` 
+  ## 3 Pods created from multiple-pods reduced to 2 Pods

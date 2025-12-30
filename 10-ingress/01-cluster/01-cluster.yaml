@@ -1,0 +1,35 @@
+
+
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: local-cluster
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 31234
+    hostPort: 31234
+    protocol: TCP    
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+- role: worker
+- role: worker    
+
+#Ingress: route the tracffic to the services within the namespace 
+
+#Ingress controller: `kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml`
+
+# install metric-server
+
+# `kind delete cluster --name local-cluster`
+# recreate cluster with ingress: `kind create cluster --config 01-clister/01-cluster.yaml`
+# install ingress controller: `kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/kind/deploy.yaml`

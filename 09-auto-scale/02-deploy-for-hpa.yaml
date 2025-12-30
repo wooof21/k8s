@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deploy
+spec:
+  selector:
+    matchLabels:
+      app: my-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: nginx
+        image: nginx  
+        startupProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 1
+          failureThreshold: 30  
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          periodSeconds: 5
+          failureThreshold: 3                
+        resources:
+          requests:
+            cpu: 50m
+            memory: 10Mi
+          limits:
+            cpu: 50m
+            memory: 10Mi  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx
+spec:
+  selector:
+    app: my-app
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: demo-pod
+spec:
+  terminationGracePeriodSeconds: 1
+  containers:
+  - name: demo
+    image: vinsdocker/util
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    args:
+    - "sleep"
+    - "3600"
+
+# run: `kubectl apply -f 02-...`
+
+# then apply hpa: `kubectl apply -f 03-...`
+  ## get hpa: `kubectl get hpa`
+
+# exec into demo pod: `kubectl exec -it demo-pod -- bash`
+
+# load test in demo pod with 'ab'(Apache Bench) command: `ab -n 20000 -c 5 http://nginx/`
+  ## watch the TARGET x%/10%(CPU Usage - Metrics defined in 03-hpa.yaml): when 'x' exceed 10, auto scale a new pod

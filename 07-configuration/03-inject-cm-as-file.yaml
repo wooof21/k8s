@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-properties
+data:
+  # create a file-like entry in the config map named application.properties
+  # This key will later turn into a real file when mounted into a Pod.
+  application.properties: | # |: pipe symbol - muti-line string
+    appUrl=http://app-url
+    timeout=30
+    a.b.c.d=something
+    username=vinoth
+  # to store the content in a file
+    # 1. create a file: application.properties
+    #   appUrl=http://app-url
+    #   timeout=30
+    #   a.b.c.d=something
+    #   username=vinoth
+    # 2. Create ConfigMap from the file: `kubectl create configmap my-config --from-file=application.properties`
+    #   -> it will create a ConfigMap like:
+    #     data:
+    #       application.properties: |
+    #         appUrl=http://app-url
+    #         timeout=30
+    #         a.b.c.d=something
+    #         username=vinoth
+    # 3. mount the file same way
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  terminationGracePeriodSeconds: 1
+  restartPolicy: Never
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    # mount volume to container and volume uses the ConfigMap
+    # this will mount the ConfigMap as files inside the container.
+    volumeMounts:
+    - name: config-volume
+      mountPath: /usr/share/props  
+    args:
+    - sleep
+    - "3600"
+  # volume uses the ConfigMap
+  volumes:
+  - name: config-volume
+    configMap:
+      name: app-properties # match metadata.name

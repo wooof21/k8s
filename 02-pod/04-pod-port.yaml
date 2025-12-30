@@ -1,0 +1,25 @@
+
+# nodes in cluster can communicate to each other via the cluster network
+# the pods running in each cluster node can also commuicate via a separte network
+# Port Forwarding: 
+  ## create a tunnel between machine and pod via API server
+  ## useful for quick debugging
+  ## not a proper way for serving the traffic
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: port-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - name: "web-port"
+      containerPort: 80   
+    - name: "local-port"
+      containerPort: 8080
+
+# set up connection: `kubectl port-forward <pod_name> <local_machine_port>:<forward_port_in_container>`
+  ## -> `kubectl port-forward port-pod 8079:80`
+    ## then the pod can be accessed from local machine by `localhost:8079`

@@ -1,0 +1,19 @@
+
+# issue sleep command for 1 hour
+# the pod status will be in running status for 1 hour then completed
+# when try to delete the pod, the container will wait for 30 seconds (default) -> termination grace period
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tgp-pod
+spec:
+  restartPolicy: Never
+  terminationGracePeriodSeconds: 1 # set the termination grace period (max wait time) to 1 sec
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    args: 
+    - "sleep"
+    - "3600" # seconds

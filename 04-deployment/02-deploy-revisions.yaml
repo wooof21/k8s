@@ -1,0 +1,42 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service-deploy
+spec:
+  selector:
+    matchLabels:
+      app: order-service
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order-service
+        image: vinsdocker/k8s-app:v2 # start with v1
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        env:
+        - name: DUMMY
+          value: "8"
+        ports:
+        - name: "app-port"
+          containerPort: 80
+
+# run deployment: `kubectl apply -f 02-deploy-revisions.yaml`
+
+# update `replicas` to 3
+  ## run deployment again: running Pod reduced to 3 with same replicaSet
+
+# update `k8s-app:v1` to `k8s-app:v2`
+  ## run deployment again: a new replicaSet will be created with 3 replicas count and old replicaSet is set to 0 count
+  ## when update in tempalte, Deployment consider a new revision
+
+# same for adding the `env` variables

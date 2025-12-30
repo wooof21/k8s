@@ -1,0 +1,52 @@
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deploy
+spec:
+  selector:
+    matchLabels:
+      app: my-app
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: nginx
+        image: vinsdocker/k8s-app:v2
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app
+spec:
+  selector:
+    app: my-app
+  ports:
+  - port: 80
+    targetPort: 80
+
+
+# create `dev` and `qa` namespace: 
+  ## `kubectl create ns dev`
+  ## `kubectl create ns qa`
+
+# deploy dev workload to dev namespace: `kubectl apply -f 04-host-based-routing/dev-workload -n dev`
+
+# when deploy qa workload to qa namespace: `kubectl apply -f 04-host-based-routing/qa-workload -n qa`
+  ## deployment and service will be created
+  ## error on creating ingress: path '/' already defined
+    ### -> use "host + path based routing"

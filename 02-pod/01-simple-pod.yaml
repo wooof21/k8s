@@ -1,0 +1,36 @@
+
+# documentation: https://kubernetes.io/docs/home/
+# Pod: https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/
+
+apiVersion: v1
+kind: Pod 
+metadata:
+  name: simple-pod
+spec:
+  containers:
+    - name: nginx
+      image: nginx
+
+
+
+# create cluster first: kind create cluster --config ../01-kind-cluster-config/kind-cluster.yaml
+# create the pod: kubectl create -f 01-simple-pod.yaml
+    ## it talks to api-server and ask to create the resource beased on the provided specification yaml file
+    ## use `watch` command to observe the pod startus change
+        ### watch -t -x kubectl get pod
+        ### in windows powershell: while ($true) {kubectl get pod; Start-Sleep -Seconds 2 }
+
+# to delete the resource: kubectl delete -f 01-simple-pod.yaml
+
+# describe pod (more info about the pod): kubectl describe pod 
+    ## Node: local-cluster-worker/172.18.0.4 -> worker ip address
+    ## IP: pod ip address
+
+# to update pod when the yaml file changes(eg. new image version): kubectl apply -f 01-simple-pod.yaml
+
+
+# pod status:
+    ## ImagePullBackOff: when fail to pull the image, the step will be retried
+
+# to explore the pod in interactive mode: `kubectl exec -it <pod_name> -- <command>`
+  ## `kubectl exec -it simple-pod -- bash`

@@ -1,0 +1,63 @@
+# vinsdocker/k8s-probe-demo uses nginx
+# nginx will start after 10 seconds
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  labels:
+    app: my-app
+spec:
+  terminationGracePeriodSeconds: 1
+  containers:
+  - name: probe-demo
+    image: vinsdocker/k8s-probe-demo
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    startupProbe:
+      httpGet:
+        path: /
+        port: 80
+      periodSeconds: 1
+      failureThreshold: 30
+    livenessProbe:
+      httpGet:
+        path: /live.html
+        port: 80
+      periodSeconds: 1
+      failureThreshold: 3    
+    readinessProbe:
+      httpGet:
+        path: /ready.html
+        port: 80
+      periodSeconds: 1
+      failureThreshold: 1      
+
+# run: `kubectl apply -f 05-...`: app becomes `ready` in about 10s
+
+# enter exec mode: `kubectl exec -it my-pod -- bash`
+
+# go to the folder: `cd /usr/share/nginx/html`
+
+# remove html file:
+  ## remove live.html: `rm live.html` -> app restarts
+  ## remove ready.html: `rm ready.html` -> READY 0/1, but no restarts
+      ### -> readinessProbe is failing, pod is not in READY state, but container is still running(livenessProbe is working), no restarts
+  ## create ready.html: `touch ready.html` -> app becomes READY 1/1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app
+spec:
+  selector:
+    app: my-app
+  ports:
+  - port: 80
+    targetPort: 80      
+

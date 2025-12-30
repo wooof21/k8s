@@ -1,0 +1,73 @@
+
+# create a Pod claim the PVC from 01-simple-pvc
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  terminationGracePeriodSeconds: 1
+  restartPolicy: Never
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    # mount the PVC to container
+    volumeMounts:
+    - name: pod-volume
+      mountPath: /usr/share/nginx/html
+  # PVC
+  volumes:
+  - name: pod-volume
+    persistentVolumeClaim:
+      claimName: my-pvc # match the PVC name defined in 01-simple-pvc
+
+# before run: `kubectl get pvc` -> pending
+
+# run: `kubectl apply -f 02-...`
+
+# `kubectl get pvc`: -> Bound
+
+# `kubectl get pv`
+
+# `kubectl describe pv`: 
+  ## Node Affinity:
+  ##  Required Terms:
+  ##    Term 0: xxxx   -----> gives the worker node where PV was created
+  ## ...
+  ##    Path: xxxxx    -----> the folder(PV) path
+
+# `docker ps`: returns all the running containers, include the PV worker node, e.g. local-cluster-worker2
+
+# go into the contianer with exec mode: `docker exec -it local-cluster-worker2 bash`
+  ## will see the PV folder path, currently is empty
+  ## exit
+
+# port forward: `kubectl port-forward my-pod 8080:80`: when access localhost:8080 -> 403
+  ## no homepage, since PV foler empty
+
+# go into the contianer with exec mode: `docker exec -it local-cluster-worker2 bash`
+  ## cd into the foler and create a file: `echo "Hello PVC" > index.html`
+  ## exit exec mode: exit
+
+# port forward: `kubectl port-forward my-pod 8080:80`: when access localhost:8080 -> "Hello PVC"
+
+# delete pod: `kubectl delete -f 02-...`
+
+# PVC still exist: `kubectl get pvc`
+
+# recreate pod: `kubectl apply -f 02-...`
+
+# port forward: `kubectl port-forward my-pod 8080:80`
+  ## when access localhost:8080 -> still see "Hello PVC"
+
+
+# delete PVC: `kubectl delete -f 01-...`
+  ## also delete PV: if RECLAIM = Delete
+  ## PV will retain: if RECLAIM = Retain

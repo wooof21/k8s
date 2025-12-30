@@ -1,0 +1,16 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: args-pod
+spec:
+  restartPolicy: Never
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    args: # passing args/commands to container, same as `docker run ubuntu date`
+    - "date"
+
+# `kubectl create -f 06-pod-args.yaml`
+# to check the container log for the date output: 
+  ## `kubectl logs <pod_name>` -> `kubectl logs args-pod`

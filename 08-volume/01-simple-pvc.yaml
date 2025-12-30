@@ -1,0 +1,37 @@
+
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  storageClassName: standard # optional if standard
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5G
+
+# get all storage class in cluster: `kubectl get storageclass` | `kubectl get sc`
+
+# get PersistentVolumeClaim: `kubectl get pvc`
+    ## PVC: A request for storage by a pod
+        ### A pod will mount a PVC
+        ### PVC automatically finds a matching PV
+
+# get PersistentVolume: `kubectl get pv`
+    ## PV: Actual storage resource (disk) in the cluster
+        ### Created manually or dynamically
+        ### Lives on the cluster
+        ### Not tied to any specific pod
+
+# ------------------------------------------- #
+# run: `kubectl apply -f 01-....`
+
+# get PVC: `kubectl get pvc`
+  ## status: pending
+
+# get details: `kubectl describe pvc`
+  ## waiting for first consumer/claim
+  ## -> pending: no application is claiming a PV
+  ## `kubectl get pv`: no resource found

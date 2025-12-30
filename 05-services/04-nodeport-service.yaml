@@ -1,0 +1,50 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deploy
+spec:
+  selector:
+    matchLabels:
+      app: my-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      terminationGracePeriodSeconds: 1
+      containers:
+      - name: nginx
+        image: vinsdocker/nginx-gke
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app
+spec:
+  # NodePort -> can be accessed from outside of cluster(local machine)
+  type: NodePort
+  selector:
+    app: my-app
+  ports:
+  - port: 80 # service port
+    targetPort: 80
+    # specify the NodePort exposed
+    # the port mapping defined in kind-cluster config
+    # when sending request to cluster_ip:30001, request should be routed to one of the pod
+    nodePort: 30001
+
+
+# run: `kubectl apply -f 04-....`
+
+# can access `localhost:30001` from outside the cluster (local machine)

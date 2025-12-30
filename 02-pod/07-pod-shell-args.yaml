@@ -1,0 +1,17 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: shell-args
+spec:
+  restartPolicy: Never
+  containers:
+  - name: ubuntu
+    image: ubuntu
+    args: 
+    - "/bin/sh" # open the shell
+    - "-c" # run command
+    - "echo The Path: $PATH" # the command
+
+# access the container log: `kubectl logs shell-args`
+  ## output -> The Path: /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin

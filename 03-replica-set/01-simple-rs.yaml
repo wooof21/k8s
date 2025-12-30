@@ -1,0 +1,33 @@
+
+# ReplicaSet: make sure the cluster always have the desired/defined number of pod running
+# when a node died, ReplicaSet will get the pod scheduled in some other available node
+# restartPolicy = ALWAYS: implicit and connot change
+
+# ReplicaSet: a lower level resource, it manages pod and should not be created directly
+# Use `Deployment` to manage `ReplicaSet`
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: my-rs
+spec:
+  selector:
+    # matchLabels -> key-value pairs, could have multiple labels
+    # used to query Pod (Pod labels) to enable the replicaSet (tell replicaSet which Pod to manage)
+    matchLabels:
+      appLabels: my-app
+  replicas: 3
+  # template: the Pod template, tells replicaSet hwo to create Pod
+  template:
+    metadata:
+      labels:
+        appLabels: my-app
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+
+
+# run: `kubectl create -f 01-simple-rs.yaml`
+# delete a signle pod: `kubectl delete pod/<pod_name>` -> a new pod will be created
+# delete all pods: `kubectl delete pod --all` -> 3 new pods will be created

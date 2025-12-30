@@ -1,0 +1,45 @@
+
+# ingress to route the traffic to different deployment by the path
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /product
+        pathType: Prefix
+        backend: 
+          service:
+            name: product-service
+            port:
+              number: 80 
+      - path: /user
+        pathType: Prefix
+        backend: 
+          service:
+            name: user-service
+            port:
+              number: 80  
+      # ingress looks for best match, even '/product' or '/user' also match this path '/'
+      # ingress see multiple matches, it will look for the best match
+      - path: /
+        pathType: Prefix
+        backend: 
+          service:
+            name: home-service
+            port:
+              number: 80                                        
+
+
+
+# apply all files: `kubectl apply -f 03-path-based-routing/`
+
+# `localhost`: route to home page
+
+# `localhost/product`: route to product page
+
+# `localhost/user`: route to user page
+

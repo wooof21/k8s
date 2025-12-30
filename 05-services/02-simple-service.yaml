@@ -1,0 +1,38 @@
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx # client name
+spec:
+  selector:
+    app: my-app
+  ports:
+  - port: 80 # service port
+    targetPort: 80 # containerPort in Deployment
+
+
+# run deployment: `kubectl apply -f 01-simple-service.yaml`
+
+# create service: `kubectl apply -f 02-simple-service.yaml`
+  ## `service/nginx` will be created
+  ## client can use the service name `nginx` to send request to one of the Pod in Deployment
+
+# get service details: `kubectl describe service nginx` or short `kubectl describe svc nginx`
+  # Name:                     nginx
+  # Namespace:                default
+  # Labels:                   <none>
+  # Annotations:              <none>
+  # Selector:                 app=my-app
+  # Type:                     ClusterIP
+  # IP Family Policy:         SingleStack
+  # IP Families:              IPv4
+  # IP:                       10.96.213.132
+  # IPs:                      10.96.213.132
+  # Port:                     <unset>  80/TCP
+  # TargetPort:               80/TCP
+  # Endpoints:                10.244.1.24:80,10.244.2.21:80,10.244.2.22:80  # -> the pod endpoint, 3 pods
+  # Session Affinity:         None
+  # Internal Traffic Policy:  Cluster
+  # Events:                   <none>
+
+  ## when calling the `nginx`(service name) service, request route to one of the pod by Endpoints

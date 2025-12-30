@@ -1,0 +1,39 @@
+
+# deployment strategy: RollingUpdate
+# maxUnavailable: number of max unavailable pods during deployment
+# replicas: 3 -> should have 3 available pods at all time
+  ## maxUnavailable: 1 -> it is OK to have 1 pod unavailable during deployment
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order-service-deploy
+spec:
+  minReadySeconds: 10
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: order-service
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: order-service
+    spec:
+      containers:
+      - name: order-service
+        image: vinsdocker/k8s-app:v2
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        ports:
+        - name: "app-port"
+          containerPort: 80

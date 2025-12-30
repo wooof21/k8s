@@ -1,0 +1,14 @@
+
+# ubuntu: container start then exist immediately
+# pod status: ContainerCreating -> completed -> CrashLoopBackOff
+# by default, restartPolicy is Always, and pod will be try to restart the container and keep it in running status
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: restart-pod
+spec:
+  restartPolicy: OnFailure # Always, Never, OnFailure
+  containers:
+  - name: ubuntu
+    image: ubuntu

@@ -1,0 +1,29 @@
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+    # startupProbe using httpGet
+    startupProbe:
+      httpGet:
+        path: / # to fail: /dummy
+        port: 80
+      periodSeconds: 1 # every 1 second
+      failureThreshold: 3
+
+# run: `kubectl apply -f 01-startup-httpget.yaml`
+
+# to make the probe fails, set path `path: /dummy`
+  ## status: create -> running -> CarashLoopBackOff
+  ## to check the fail reason: `kubectl describe pod`: startup probe failed with 404

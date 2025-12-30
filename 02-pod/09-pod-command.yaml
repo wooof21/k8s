@@ -1,0 +1,19 @@
+
+# the docker image is using `ENTRYPOINT` for its default command to run, which cannot be override
+  ## `docker run vinsdocker/k8s-entrypoint date` -> will not run the date command
+
+# to override the default ENTRYPOINT command with kubernetes: `command`
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: command-pod
+spec:
+  restartPolicy: Never
+  containers:
+  - name: entrypoint
+    image: vinsdocker/k8s-entrypoint
+    # args: # this will not work, "date" command will not be executed
+    # - "date"
+    command: # to override ENTRYPOINT command
+    - "date"

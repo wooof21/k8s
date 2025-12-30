@@ -1,0 +1,33 @@
+
+
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler # depends on the Metrics Server
+metadata:
+  name: [ ? ] 
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: [ ? ]
+  minReplicas: [ ? ]  # min pods to run
+  maxReplicas: [ ? ]  # max pods to scale
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: [ ? ]
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: AverageValue
+        averageValue: [ ? ]    
+  # when resources utilization drops and should scale down pods
+  behavior: 
+    scaleDown:
+      # this tells when to scale down -> wait at least ? seconds
+      # means when load reduces, do not kill the pods immediately, wait for some time and slowly kill the pod
+      stabilizationWindowSeconds: [ ? ]          

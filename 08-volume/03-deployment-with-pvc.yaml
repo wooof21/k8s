@@ -1,0 +1,62 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  storageClassName: standard
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5G
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deploy
+spec:
+  selector:
+    matchLabels:
+      app: my-app
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        resources:
+          requests:
+            cpu: "250m"
+            memory: "256Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+        # run at start, write to html at mounted path
+        startupProbe: 
+          exec:
+            command:
+            - "/bin/sh"
+            - "-c"
+            - 'echo "$(hostname)</br>" >> /usr/share/nginx/html/index.html'  
+        volumeMounts:
+        - name: pod-volume
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: pod-volume
+        persistentVolumeClaim:
+          claimName: my-pvc        
+
+
+# run: `kubectl apply -f 03-deployment...`
+
+# port forward on whole deployment: `kubectl port-forward deploy/my-deploy 8080:80`
+  ## when access homepage: `localhost:8080`
+    ### the request was only routed to one pod, but all 3 hostname for deployed 3 pods were showing in one html file
+    ### all 3 pods were attaching to one PV
+    ### when 3 pods start, each pod will write its hostname to the same PV file
+    ### this deployment, all 3 pods share the same PV
+
+# to have each pod have its own storage, use `StatefulSet`

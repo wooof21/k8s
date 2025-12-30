@@ -1,0 +1,32 @@
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deploy
+spec:
+  selector:
+    matchLabels:
+      app: my-app
+  replicas: 40
+  template:
+    metadata:
+      labels:
+        app: my-app
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
+        resources:
+          requests:
+            cpu: 2
+            memory: 100Mi
+          limits:
+            cpu: 2
+            memory: 500Mi            
+
+# run: `kubectl apply -f 01-...`
+
+# `kubectl top pod`: returns the resouces usage for running pods
+
+# a pod in PENDING state: no resouces available for requested resources
